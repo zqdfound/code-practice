@@ -1,7 +1,7 @@
 package com.zqdfound.practice.design.single;
 
 /**
- * 单例，双重检查锁
+ *
  * @Author: zhuangqingdian
  * @Data:2022/12/26
  */
