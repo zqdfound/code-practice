@@ -3,7 +3,7 @@ package com.zqdfound.practice.juc;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * countDownLatch
+ * countDownLatch(闭锁)
  * 模仿多线程批处理
  * @Author: zhuangqingdian
  * @Data:2022/12/30
