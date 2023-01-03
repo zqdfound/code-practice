@@ -2,6 +2,7 @@ package com.zqdfound.practice.utils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
@@ -9,12 +10,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * jdk11 httpclient
@@ -65,6 +66,32 @@ public class NewHttpUtil {
         System.out.println(result);
     }
 
+    public void sendGetByExecutor() throws URISyntaxException, ExecutionException, InterruptedException {
+         HttpClient executorClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_2)
+                .connectTimeout(Duration.ofSeconds(5))
+                 .executor(Executors.newFixedThreadPool(5))
+                .build();
+        List<URI> targets = Arrays.asList(
+                new URI("https://httpbin.org/get?name=mkyong1"),
+                new URI("https://httpbin.org/get?name=mkyong2"),
+                new URI("https://httpbin.org/get?name=mkyong3"));
+
+        List<CompletableFuture<String>> result = targets.stream().map(url->{
+            return executorClient.sendAsync(
+                    HttpRequest.newBuilder(url)
+                            .GET()
+                            .setHeader("User-Agent", "Java 11 HttpClient Bot")
+                            .build(),
+                    HttpResponse.BodyHandlers.ofString()
+            ).thenApply(response->response.body());
+        }).collect(Collectors.toList());
+
+        for (CompletableFuture<String> future : result) {
+            System.out.println(future.get());
+        }
+
+    }
     public void sendPostFormSync() throws IOException, InterruptedException {
         // form参数
         Map<Object, Object> data = new HashMap<>();
